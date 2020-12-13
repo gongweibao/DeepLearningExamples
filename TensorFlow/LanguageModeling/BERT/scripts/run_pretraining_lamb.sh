@@ -57,4 +57,4 @@ printf -v SCRIPT_ARGS "%d %d %d %e %e %s %s %d %d %d %d %d %d %d %s %s" \
 bash scripts/run_pretraining_lamb_phase1.sh $SCRIPT_ARGS |& tee -a $LOGFILE
 
 # RUN PHASE 2
-bash scripts/run_pretraining_lamb_phase2.sh $SCRIPT_ARGS |& tee -a $LOGFILE
+#bash scripts/run_pretraining_lamb_phase2.sh $SCRIPT_ARGS |& tee -a $LOGFILE
