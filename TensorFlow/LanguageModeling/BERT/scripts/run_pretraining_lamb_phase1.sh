@@ -71,6 +71,7 @@ if [ $num_gpus -gt 1 ] ; then
                -mca btl_tcp_if_exclude docker0,lo,matrixdummy0,matrix0 \
                -x PATH -x LD_LIBRARY_PATH"
    echo "mpirun command:" $mpi
+   echo "LD_LIBRARY_PATH:" $LD_LIBRARY_PATH
    horovod_str="--horovod"
 fi
 
