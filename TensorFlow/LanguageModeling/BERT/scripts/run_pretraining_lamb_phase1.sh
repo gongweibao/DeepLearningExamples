@@ -65,7 +65,19 @@ fi
 mpi=""
 horovod_str=""
 if [ $num_gpus -gt 1 ] ; then
-   mpi="mpiexec --allow-run-as-root -np $num_gpus --bind-to socket"
+   mpi="/usr/local/openmpi-3.1.0/bin/orterun --allow-run-as-root -tag-output \
+               -timestamp-output --hostfile ${TRAIN_WORKSPACE}/hostfile \
+               -mca btl_tcp_if_exclude docker0,lo,matrixdummy0,matrix0 \
+               -x PATH -x LD_LIBRARY_PATH \
+               -x NCCL_IB_GID_INDEX \
+               -x NCCL_IB_DISABLE \
+               -x NCCL_IB_CUDA_SUPPORT \
+               -x NCCL_P2P_DISABLE \
+               -x NCCL_DEBUG \
+               -x NCCL_SOCKET_IFNAME \
+               -x IBV_DRIVERS"
+   echo "mpirun command:" $mpi
+   echo "LD_LIBRARY_PATH:" $LD_LIBRARY_PATH
    horovod_str="--horovod"
 fi
 
@@ -89,7 +101,7 @@ for DIR_or_file in $DATA_DIR $RESULTS_DIR_PHASE1 $BERT_CONFIG; do
   fi
 done
 
- $mpi python /workspace/bert/run_pretraining.py \
+$mpi python ./run_pretraining.py \
      --input_files_dir=$INPUT_FILES \
      --eval_files_dir=$EVAL_FILES \
      --output_dir=$RESULTS_DIR_PHASE1 \
