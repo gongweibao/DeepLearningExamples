@@ -38,7 +38,7 @@ export BERT_PREP_WORKING_DIR="./"
 #DATASET=hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5_shard_1472_test_split_10/books_wiki_en_corpus/training # change this for other datasets
 DATASET="./data/hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5/wikicorpus_en/training/"
 DATA_DIR_PHASE1=${21:-$BERT_PREP_WORKING_DIR/${DATASET}/}
-BERT_CONFIG=bert_config.json
+BERT_CONFIG=bert_config_base.json
 DATASET2=hdf5_lower_case_1_seq_len_512_max_pred_80_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5_shard_1472_test_split_10/books_wiki_en_corpus/training # change this for other datasets
 DATA_DIR_PHASE2=${22:-$BERT_PREP_WORKING_DIR/${DATASET2}/}
 CODEDIR=${23:-"./"}
@@ -113,7 +113,7 @@ CMD=" $CODEDIR/run_pretraining.py"
 CMD+=" --input_dir=$DATA_DIR_PHASE1"
 CMD+=" --output_dir=$CHECKPOINTS_DIR"
 CMD+=" --config_file=$BERT_CONFIG"
-CMD+=" --bert_model=bert-large-uncased"
+CMD+=" --bert_model=bert-base-uncased"
 CMD+=" --train_batch_size=$train_batch_size"
 CMD+=" --max_seq_length=128"
 CMD+=" --max_predictions_per_seq=20"
