@@ -43,6 +43,9 @@ DATASET2=hdf5_lower_case_1_seq_len_512_max_pred_80_masked_lm_prob_0.15_random_se
 DATA_DIR_PHASE2=${22:-$BERT_PREP_WORKING_DIR/${DATASET2}/}
 CODEDIR=${23:-"./"}
 init_checkpoint=${24:-"None"}
+master_node=${MASTER_NODE:-"127.0.0.1"}
+master_port=${MASTER_PORT:-"6700"}
+node_rank=${NODE_RANK:-"0"}
 RESULTS_DIR=$CODEDIR/results
 CHECKPOINTS_DIR=$RESULTS_DIR/checkpoints
 
@@ -127,8 +130,8 @@ CMD+=" $INIT_CHECKPOINT"
 CMD+=" --do_train"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="python3 -m torch.distributed.launch --nproc_per_node=$num_gpus $CMD"
-
+CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus --nnodes $num_nodes \
+    --node_rank=${node_rank} --master_addr=$master_node  --master_port=$master_port $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size \* $num_gpus)
@@ -150,6 +153,7 @@ fi
 set +x
 
 echo "finished pretraining"
+exit 0
 
 #Start Phase2
 
@@ -203,7 +207,10 @@ CMD+=" $ALL_REDUCE_POST_ACCUMULATION_FP16"
 CMD+=" --do_train --phase2 --resume_from_checkpoint --phase1_end_step=$train_steps"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus $CMD"
+CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus --nnodes $num_nodes \
+    --node_rank=${node_rank} --master_addr=$master_node  --master_port=$master_port $CMD"
+
+echo "pytorch cmd:" $CMD
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size_phase2 \* $num_gpus)
