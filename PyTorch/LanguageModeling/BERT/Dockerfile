@@ -14,6 +14,10 @@
 ARG FROM_IMAGE_NAME=nvcr.io/nvidia/pytorch:20.06-py3
 FROM nvcr.io/nvidia/tritonserver:20.06-v1-py3-clientsdk as trt
 FROM ${FROM_IMAGE_NAME}
+
+ARG https_proxy
+ARG http_proxy
+
 RUN apt-get update && apt-get install -y pbzip2 pv bzip2 cabextract
 
 ENV BERT_PREP_WORKING_DIR /workspace/bert/data
@@ -38,4 +42,4 @@ RUN pip install --upgrade --no-cache-dir pip \
 
 RUN apt-get install -y iputils-ping
 
-COPY . .
+#COPY . .

@@ -34,12 +34,14 @@ learning_rate_phase2=${17:-"4e-3"}
 warmup_proportion_phase2=${18:-"0.128"}
 train_steps_phase2=${19:-1563}
 gradient_accumulation_steps_phase2=${20:-512}
-DATASET=hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5_shard_1472_test_split_10/books_wiki_en_corpus/training # change this for other datasets
+export BERT_PREP_WORKING_DIR="./"
+#DATASET=hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5_shard_1472_test_split_10/books_wiki_en_corpus/training # change this for other datasets
+DATASET="./data/hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5/wikicorpus_en/training/"
 DATA_DIR_PHASE1=${21:-$BERT_PREP_WORKING_DIR/${DATASET}/}
 BERT_CONFIG=bert_config.json
 DATASET2=hdf5_lower_case_1_seq_len_512_max_pred_80_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5_shard_1472_test_split_10/books_wiki_en_corpus/training # change this for other datasets
 DATA_DIR_PHASE2=${22:-$BERT_PREP_WORKING_DIR/${DATASET2}/}
-CODEDIR=${23:-"/workspace/bert"}
+CODEDIR=${23:-"./"}
 init_checkpoint=${24:-"None"}
 RESULTS_DIR=$CODEDIR/results
 CHECKPOINTS_DIR=$RESULTS_DIR/checkpoints
@@ -201,7 +203,7 @@ CMD+=" $ALL_REDUCE_POST_ACCUMULATION_FP16"
 CMD+=" --do_train --phase2 --resume_from_checkpoint --phase1_end_step=$train_steps"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="python3 -m torch.distributed.launch --nproc_per_node=$num_gpus $CMD"
+CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size_phase2 \* $num_gpus)
