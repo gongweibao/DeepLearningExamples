@@ -46,6 +46,7 @@ init_checkpoint=${24:-"None"}
 master_node=${MASTER_NODE:-"127.0.0.1"}
 master_port=${MASTER_PORT:-"6700"}
 node_rank=${NODE_RANK:-"0"}
+num_nodes=${NUM_NODES:-"1"}
 RESULTS_DIR=$CODEDIR/results
 CHECKPOINTS_DIR=$RESULTS_DIR/checkpoints
 
@@ -133,6 +134,8 @@ CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus --nnodes $num_nodes \
     --node_rank=${node_rank} --master_addr=$master_node  --master_port=$master_port $CMD"
 
+echo "pytorch cmd:" $CMD
+
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size \* $num_gpus)
   printf -v TAG "pyt_bert_pretraining_phase1_%s_gbs%d" "$precision" $GBS
@@ -208,7 +211,7 @@ CMD+=" --do_train --phase2 --resume_from_checkpoint --phase1_end_step=$train_ste
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
 CMD="python -m torch.distributed.launch --nproc_per_node=$num_gpus --nnodes $num_nodes \
-    --node_rank=${node_rank} --master_addr=$master_node  --master_port=$master_port $CMD"
+    --node_rank=${node_rank} --nnodes=${PADDLE_TRAINERS_NUM} --master_addr=$master_node  --master_port=$master_port $CMD"
 
 echo "pytorch cmd:" $CMD
 
